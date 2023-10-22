@@ -1,13 +1,3 @@
-body {
-  margin: 0;
-  background-color: black;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  color: white;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -15,12 +5,142 @@ code {
   
 }
 .bubble-container {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  padding: 10px;
+  display: inline-block;
+  margin-right: 16px;
 }
 
 .bubble {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  padding: 16px;
+  background-color: grey;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+/* Add a hover effect to the bubbles */
+.bubble:hover {
+  background-color: #e9ecef;
+}
+.bubble h2 {
   margin: 0;
+}
+
+.bubble h3 {
+  margin: 8px 0;
+}
+
+.bubble p {
+  margin: 0;
+}
+
+/* Define a font family */
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100;700&display=swap');
+
+/* Define a color scheme */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --background-color: #f8f9fa;
+  --text-color: #212529;
+}
+
+/* Apply the font family to the app */
+body {
+  font-family: 'Raleway', sans-serif;
+}
+
+/* Apply the color scheme to the app */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Style the "Connect Wallet" button */
+button {
+  background-color: var(--primary-color);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Style the wallet address */
+.wallet-address {
+  font-size: 14px;
+  color: var(--secondary-color);
+}
+
+/* Add a logo to the app */
+.logo {
+  width: 100px;
+  height: 100px;
+  margin: 16px;
+}
+
+/* Add a fade-in animation to elements */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Add a transition to the "Disconnect Wallet" button */
+.disconnect-button {
+  background-color: var(--secondary-color);
+  transition: background-color 0.3s ease;
+}
+
+.disconnect-button:hover {
+  background-color: #4e555b;
+}
+
+/* Add styles for dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #1a73e8;
+    --secondary-color: #8f8f8f;
+    --background-color: #1c1c1c;
+    --text-color: #f8f9fa;
+  }
+
+  button {
+    background-color: transparent;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  .wallet-address {
+    color: var(--secondary-color);
+  }
+
+  .disconnect-button {
+    background-color: var(--secondary-color);
+  }
+
+  .disconnect-button:hover {
+    background-color: #4e555b;
+  }
 }

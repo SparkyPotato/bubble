@@ -2,11 +2,27 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-
+import { Connect } from '@stacks/connect-react';
+import { userSession } from './components/ConnectWallet';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Connect
+      authOptions={{
+        appDetails: {
+          name: 'Stacks React Template',
+          icon: window.location.origin + '/logo.png',
+        },
+        redirectTo: '/',
+        onFinish: () => {
+          console.log('Finished connecting wallet.');
+          window.location.reload();
+        },
+        userSession,
+      }}
+    >
+      <App />
+    </Connect>
   </React.StrictMode>
 );
