@@ -192,6 +192,8 @@ const bubbles = [
 
   // more bubbles...
 ];
+
+
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [showNewBubble, setShowNewBubble] = useState(false);
