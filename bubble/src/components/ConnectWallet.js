@@ -33,9 +33,11 @@ const ConnectWallet = ({ onConnect }) => {
     onConnect();
     return (
       <div>
+        
         <button className="Connect" onClick={disconnect}>
           Disconnect Wallet
         </button>
+      
     
       </div>
     );
