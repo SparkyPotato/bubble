@@ -1,6 +1,6 @@
 (define-map users { user: principal } { nickname: (string-utf8 50) })
 (define-map threads { id: uint } { title: (string-utf8 100), posts: uint })
-(define-map posts { thread: uint, id: uint } { author: principal, content: (string-utf8 500) })
+(define-map posts { thread: uint, id: uint } { author: principal, content: (string-utf8 250) })
 
 (define-data-var thread-counter uint u0)
 
@@ -11,7 +11,7 @@
     )
 )
 
-(define-public (start-thread (title (string-utf8 100)) (content (string-utf8 500)))
+(define-public (start-thread (title (string-utf8 100)) (content (string-utf8 250)))
     (let ((thread-id (var-get thread-counter)))
     (begin
         (map-insert threads { id: thread-id } { title: title, posts: u0 })
@@ -22,7 +22,7 @@
     )
 )
 
-(define-public (post-reply (thread-id uint) (content (string-utf8 500)))
+(define-public (post-reply (thread-id uint) (content (string-utf8 250)))
     (let ((thread (unwrap! (map-get? threads { id: thread-id }) (err "Thread does not exist"))))
     (let ((post-id (get posts thread)))
     (begin

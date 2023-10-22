@@ -51,6 +51,6 @@ plan:
         - emulated-contract-publish:
             contract-name: bubble
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: "contracts\\bubble.clar"
+            path: "contracts/bubble.clar"
             clarity-version: 2
       epoch: "2.4"

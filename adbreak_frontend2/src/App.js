@@ -1,18 +1,14 @@
 import logo from "./logo.svg";
 import "./App.css";
 
-import ConnectWallet from "./components/ConnectWallet";
-import ContractCallVote from "./components/ContractCallVote";
+import { ConnectWallet, setNickname } from "./components/Contract";
 
 function App() {
   return (
     <div className="App">
-        
-        {/* ConnectWallet file: `./src/components/ConnectWallet.js` */}
-        <ConnectWallet />
+        <ConnectWallet/>
 
-        {/* ContractCallVote file: `./src/components/ContractCallVote.js` */}
-        <ContractCallVote />
+        <button onClick={() => setNickname("marwan sucks")}>X</button>
     </div>
   );
 }

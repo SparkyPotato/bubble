@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import ConnectWallet from "./components/ConnectWallet";
-import ContractCallVote from "./components/ContractCallVote";
-
+import React, { useState, useEffect } from 'react';
+import { ConnectWallet, userSession, setNickname, startThread, postReply, getUserAddress, getNickname, getThread, getPost, getThreadCount } from "./components/Contract";
 
 const Reply = ({ reply }) => (
   <div className='reply'>
@@ -10,59 +8,84 @@ const Reply = ({ reply }) => (
   </div>
 );
 
-// Bubble component
 const Bubble = ({ bubble }) => (
   <div className="bubble-container">
     <div className="bubble">
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ display: 'inline-block'}}>{bubble.title}</h2>
-        <button>Reply</button>
-    </div>
-      
-  
-      <div>
-        <h3> {bubble.username}</h3>
-        <p>{bubble.content}</p>
-        <hr></hr>
       </div>
-        
-        {bubble.replies.map((reply) => (
-          <div>
-          <Reply key={reply.id} reply={reply} />
-          <hr></hr>
-          </div>
-          
-        ))}
+      {bubble.posts.map((post, i) => (
+        <div>
+          <Reply key={i} reply={post} />
+          <hr/>
+        </div>  
+      ))}
     </div>
   </div>
 );
 
-
 const BubblePage = ({ bubble, onClose }) => {
+  const [reply, setReply] = useState("");
+
   return (
     <div className="bubble-page">
       <h2>{bubble.title}</h2>
-      
-      <div>
-        <h3>{bubble.username}</h3>
-        <p>{bubble.content}</p>
-        <hr/>
-      </div>
-
-      {bubble.replies.map((reply) => (
-        <div key={reply.id} className='reply'>
-          <h3>{reply.username}</h3>
-          <p>{reply.content}</p>
+      {bubble.posts.map((post, i) => (
+        <div key={i} className='reply'>
+          <h3>{post.username}</h3>
+          <p>{post.content}</p>
           <hr/>
         </div>
       ))}
+      <textarea type="text" placeholder="Reply" value={reply} onChange={(e) => setReply(e.target.value)} style={{ display: 'block',  padding: '10px', marginBottom: '10px', border: 'none', borderBottom: '1px solid #ccc', fontSize: '18px', color:"grey", height: '50px', width: "400px", resize: "none" }} />
+      <button onClick={() => {
+        postReply(bubble.id, reply, () => {
+          setReply("");
+        })
+      }}>Reply</button>
       <button onClick={onClose}>Close</button>
     </div>
   );
 };
-// Thread component 
-const Thread = ({ bubbles }) => {
+
+const Threads = () => {
+  const [bubbles, setBubbles] = useState([]);
   const [selectedBubble, setSelectedBubble] = useState(null);
+
+  const fetch = async () => {
+    const count = await getThreadCount();
+    for (let i = 0; i < count; i++) {
+      const b = await getThread(i);
+
+      const posts = b.posts.value;
+      const p = []
+      for (let j = 0; j < posts; j++) {
+        let po = await getPost(i, j);
+        p.push({
+          username: po.data.username.data,
+          content: po.data.content.data,
+        });
+      }
+
+      const bubble = {
+        id: i,
+        title: b.title.data,
+        posts: p,
+      };
+      if (bubbles.length > i) {
+        bubbles[i] = bubble;
+      } else {
+        bubbles.push(bubble);
+      }
+    }
+
+    setBubbles(bubbles);
+  };
+  useEffect(() => {
+    fetch();
+    const id = setInterval(fetch, 30000);
+    return () => clearInterval(id);
+  }, []);
 
   const handleBubbleClick = (bubble) => {
     setSelectedBubble(bubble);
@@ -73,25 +96,15 @@ const Thread = ({ bubbles }) => {
       {selectedBubble ? (
         <BubblePage bubble={selectedBubble} onClose={() => setSelectedBubble(null)} />
       ) : (
-        bubbles.map((bubble) => (
-          <div key={bubble.id} className="bubble" onClick={() => handleBubbleClick(bubble)}>
-            
+        bubbles.map((bubble, i) => (
+          <div key={i} className="bubble" onClick={() => handleBubbleClick(bubble)}>
             <h2>{bubble.title}</h2>
-            <div>
-              <h3>{bubble.username}</h3>
-              <p>{bubble.content}</p>
-              <hr/>
-            </div>
-
-        
-      
             <div className="replies">
-              {bubble.replies.slice(0, 3).map((reply) => ( //will only display first 3 replies on main page
-                <div key={reply.id} className="reply">
-                  <h3>{reply.username}</h3>
-                  <p>{reply.content}</p>
-                  
-                <hr/>
+              {bubble.posts.slice(0, 3).map((post, j) => (
+                <div key={j} className="reply">
+                  <h3>{post.username}</h3>
+                  <p>{post.content}</p>
+                  <hr/>
                 </div>
               ))}
             </div>
@@ -102,9 +115,6 @@ const Thread = ({ bubbles }) => {
   );
 };
 
-
-
-
 const NewBubble = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -112,10 +122,12 @@ const NewBubble = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setTitle('');
-    setContent('');
-    setIsOpen(false);
-    <ContractCallVote/>
+
+    startThread(title, content, () => {
+      setTitle('');
+      setContent('');
+      setIsOpen(false);
+    });
   };
 
   const handleCancel = () => {
@@ -124,7 +136,6 @@ const NewBubble = () => {
 
   return (
     <div>
-      
       {isOpen && (
         <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: "black", padding: '20px', borderRadius: '10px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)' }}>
           <form onSubmit={handleSubmit}>
@@ -141,83 +152,36 @@ const NewBubble = () => {
   );
 };
 
-
-
-// Usage
-// Array of bubbles
-const bubbles = [
-  { 
-    id: 1, 
-    username: 'Marwan',
-    title: "Hello World",
-    content: 'This is the first bubble.',
-    replies: [
-      { id: 1, username: 'Shey', content: 'This is a reply.' },
-      // more replies...
-    ]
-  },
-  { 
-    id: 2, 
-    username: 'Shaye',
-    title: "I need a gf",
-    content: 'Please i need gf immediatenfvdcngjdnogfly',
-    replies: [
-      { id: 1, username: 'Prath', content: 'I do not volunteer' },
-      { id: 1, username: 'Costa', content: 'Me' },
-      // more replies...
-    ]
-  },
-  { 
-    id: 2, 
-    username: 'Shaye',
-    title: "I need a gf",
-    content: 'Please i need gf immediately',
-    replies: [
-      { id: 1, username: 'Prath', content: 'I do not volunteer' },
-      { id: 1, username: 'Costa', content: 'Me' },
-      // more replies...
-    ]
-  },
-  { 
-    id: 2, 
-    username: 'Shaye',
-    title: "I need a gf",
-    content: 'Please i need gf immediately',
-    replies: [
-      { id: 1, username: 'Prath', content: 'I do not volunteer' },
-      { id: 1, username: 'Costa', content: 'Me' },
-      // more replies...
-    ]
-  },
-
-  // more bubbles...
-];
-
-
 function App() {
-  const [isConnected, setIsConnected] = useState(false);
   const [showNewBubble, setShowNewBubble] = useState(false);
-
-  const handleConnect = () => {
-    setIsConnected(true);
-  };
+  const [userData, setUserData] = useState(undefined);
 
   const handleNewBubble = () => {
     setShowNewBubble(!showNewBubble);
   };
 
+  useEffect(() => {
+    if (userSession.isSignInPending()) {
+      userSession.handlePendingSignIn().then((userData) => {
+        setUserData(userData);
+      });
+    } else if (userSession.isUserSignedIn()) {
+      setUserData(userSession.loadUserData());
+    }
+  }, []);
+
   return (
     <div className="App">
-      {isConnected ? (
+      {userData ? (
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h1 style={{ textAlign: 'center', margin: 0 }}>Bubble</h1>
-            <ConnectWallet onConnect={handleConnect} />
+            <ConnectWallet/>
             <button onClick={handleNewBubble}>New Bubble</button>
           </div>
-          <hr />
+          <hr/>
           <div className="mainBubbles" style={{ display: 'flex', justifyContent: 'center' }}>
-            <Thread bubbles={bubbles} />
+            <Threads/>
           </div>
           {showNewBubble && <NewBubble onNewBubble={() => {}} />}
         </>
@@ -225,7 +189,7 @@ function App() {
         <div className="welcome-text" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', height: '100vh' }}>
           <h1>Welcome to Bubble</h1>
           <p>Please connect your wallet to continue.</p>
-          <ConnectWallet onConnect={handleConnect} />
+          <ConnectWallet/>
         </div>
       )}
     </div>

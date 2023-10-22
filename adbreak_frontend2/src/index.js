@@ -6,17 +6,14 @@ import reportWebVitals from "./reportWebVitals";
 
 import { Connect } from "@stacks/connect-react";
 
-import { userSession } from "./components/ConnectWallet";
+import { appDetails, userSession } from "./components/Contract";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Connect
       authOptions={{
-        appDetails: {
-          name: "Bubbles",
-          icon: window.location.origin + "/logo.png",
-        },
+        appDetails,
         redirectTo: "/",
         onFinish: () => {
           window.location.reload();
