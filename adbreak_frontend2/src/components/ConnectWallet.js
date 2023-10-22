@@ -8,7 +8,7 @@ export const userSession = new UserSession({ appConfig });
 function authenticate() {
   showConnect({
     appDetails: {
-      name: "Stacks React Starter",
+      name: "Bubbles",
       icon: window.location.origin + "/logo512.png",
     },
     redirectTo: "/",
@@ -37,7 +37,7 @@ const ConnectWallet = () => {
   }
 
   return (
-    <button className="Connect" onClick={authenticate}>
+    <button class="btn btn--primary" onClick={authenticate}>
       Connect Wallet
     </button>
   );
